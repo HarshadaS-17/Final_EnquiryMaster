@@ -9,6 +9,8 @@ import CallPopup from '../Master/CallPopup';
 import styled from 'styled-components';
 import RemarkForm from '../Master/RemarkForm';
 import Filter from './Filter';
+import { Form } from 'react-bootstrap';
+
 
 const BootstrapIconsCDN = () => (   
     <link
@@ -184,6 +186,9 @@ const EnquiryMaster = () => {
         { id: 3, name: 'Punit' },
     ]);
 
+    const leadTypeOptions = ['Cold', 'Warm', 'Hot'];
+
+
     // Remark state
     const [showRemark, setShowRemark] = useState(false);
     const [remark, setRemark] = useState('');
@@ -194,6 +199,7 @@ const EnquiryMaster = () => {
     const [historyEnquiryId, setHistoryEnquiryId] = useState(null); // Track which row's history is being viewed
     const [showHistory, setShowHistory] = useState(false); // State to show remark history
     const [expandedEnquiryId, setExpandedEnquiryId] = useState(null); // Track which row is expanded
+    
 
     // Function to get status color
     const getStatusColor = (status) => {
@@ -206,21 +212,24 @@ const EnquiryMaster = () => {
         }
     };
 
-    // Popup handlers
-    <WhatsAppPopup
-    show={showWhatsapp}
-    handleClose={() => setShowWhatsapp(false)}
-    clientName={selectedClient}
-  />
+
+const handleWhatsappClick = (clientName) => {
+    setSelectedClient(clientName);
+    setShowWhatsapp(true);
+  };
+
   
-    const handleEmailClick = (clientName) => {
-        setSelectedClient(clientName);
-        setShowEmail(true);
-    };
-    const handleCallClick = (clientName) => {
-        setSelectedClient(clientName);
-        setShowCall(true);
-    };
+  const handleEmailClick = (clientName) => {
+    setSelectedClient(clientName);
+    setShowEmail(true);
+  };
+  const handleCallClick = (clientName) => {
+    setSelectedClient(clientName);
+    setShowCall(true);
+  };
+
+ 
+
     const toggleFilter = () => setShowFilter(!showFilter);
     const toggleImport = () => setShowImport(!showImport);
     const toggleForm = () => {
@@ -340,7 +349,7 @@ const EnquiryMaster = () => {
                 nextFollowUpDate: nextFollowUpDateTime,
                 leadStage,
                 leadStatus,
-                leadType,
+               
                 remarkHistory: [
                   ...(enq.remarkHistory || []),
                   {
@@ -372,6 +381,16 @@ const EnquiryMaster = () => {
           )
         );
       };
+
+
+      const handleLeadTypeChange = (enquiryId, newType) => {
+        const updatedEnquiries = enquiries.map(enquiry => 
+            enquiry.id === enquiryId
+                ? { ...enquiry, leadType: newType }
+                : enquiry
+        );
+        setEnquiries(updatedEnquiries); // Update the state
+    }
       
       
     // Form close
@@ -415,6 +434,7 @@ const EnquiryMaster = () => {
         setCurrentStatus(enquiry.status || ''); // Set current status
         setShowRemark(true);
     };
+        
 
     // History handler
     const handleHistoryClick = (enquiry) => {
@@ -580,22 +600,34 @@ const EnquiryMaster = () => {
           </select>
         </td>
         <td>
-  <MinimalIconButton onClick={() => handleWhatsappClick(enquiry.applicant)}>
-    <SubtleIcon className="bi bi-whatsapp text-success" />
-  </MinimalIconButton>
+        <MinimalIconButton onClick={() => handleWhatsappClick(enquiry.applicant)}>
+        <SubtleIcon className="bi bi-whatsapp text-success" />
+      </MinimalIconButton>
 </td>
 
                                                 <td>
-                                                    <MinimalIconButton onClick={() => handleEmailClick(enquiry.applicant)}>
-                                                        <SubtleIcon className="bi bi-envelope text-primary" />
-                                                    </MinimalIconButton>
+                                                <MinimalIconButton onClick={() => handleEmailClick(enquiry.applicant)}>
+        <SubtleIcon className="bi bi-envelope text-primary" />
+      </MinimalIconButton>
                                                 </td>
                                                 <td>
-                                                    <MinimalIconButton onClick={() => handleCallClick(enquiry.applicant)}>
-                                                        <SubtleIcon className="bi bi-telephone text-info" />
-                                                    </MinimalIconButton>
+                                                     <MinimalIconButton onClick={() => handleCallClick(enquiry.applicant)}>
+        <SubtleIcon className="bi bi-telephone-outbound text-warning" />
+      </MinimalIconButton>
                                                 </td>
-                                                <td>{enquiry.allocatedTo || <span style={{color: '#dc3545'}}>Not allocated</span>}</td>
+                                                <td>
+    <Form.Select
+        value={enquiry.leadType || ''}
+        onChange={(e) => handleLeadTypeChange(enquiry.id, e.target.value)}
+        size="sm"
+    >
+        <option value="">Select Type</option>
+        {leadTypeOptions.map(type => (
+            <option key={type} value={type}>{type}</option>
+        ))}
+    </Form.Select>
+</td>
+
                                                 <td>{enquiry.nextFollowUpDate}</td>
                                                 <td>
                                                     <span className={`badge bg-${
@@ -614,7 +646,7 @@ const EnquiryMaster = () => {
 
                                                 <td>
                                                     <div className="d-flex">
-                                                    <MinimalIconButton onClick={() => handleView(enquiry)}>
+                                                    <MinimalIconButton  onClick={() => navigate(`/enquiry/${enquiry.id}`)}>
                                                        <SubtleIcon className="bi bi-eye text-primary" />
                                                     </MinimalIconButton>
                                                         <MinimalIconButton onClick={() => handleEdit(enquiry)}>
@@ -960,28 +992,29 @@ const EnquiryMaster = () => {
                 )}
 
                
-                 {/* WhatsApp Popup Modal */}
-    <WhatsAppPopup
-      show={showWhatsapp}
-      handleClose={() => setShowWhatsapp(false)}
-      clientName={selectedClient}
-    />
+      {/* WhatsApp Popup Modal */}
+      <WhatsAppPopup
+        show={showWhatsapp}
+        handleClose={() => setShowWhatsapp(false)}
+        clientName={selectedClient}
+      />
+    
   
                 {/* Email Popup */}
-                {showEmail && (
-                    <EmailPopup
-                        clientName={selectedClient}
-                        onClose={() => setShowEmail(false)}
-                    />
-                )}
+                <EmailPopup
+        show={showEmail}
+        handleClose={() => setShowEmail(false)}
+        clientName={selectedClient}
+      />
 
                 {/* Call Popup */}
-                {showCall && (
-                    <CallPopup
-                        clientName={selectedClient}
-                        onClose={() => setShowCall(false)}
-                    />
-                )}
+                <CallPopup
+        show={showCall}
+        handleClose={() => setShowCall(false)}
+        clientName={selectedClient}
+      />
+
+      
 {showRemark && (
   <RemarkForm
     show={showRemark}

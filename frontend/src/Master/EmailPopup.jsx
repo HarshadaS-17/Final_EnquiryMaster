@@ -24,7 +24,7 @@ const EmailPopup = ({ show, handleClose, clientName }) => {
 
   return (
     <Modal show={show} onHide={handleClose} size="lg" centered>
-      <Modal.Header closeButton className="bg-primary text-white">
+      <Modal.Header closeButton className="bg-warning text-white">
         <Modal.Title>
           <i className="bi bi-envelope-fill me-2"></i>
           Email Conversation with <b>{clientName}</b>
@@ -61,7 +61,7 @@ const EmailPopup = ({ show, handleClose, clientName }) => {
           />
         </Form.Group>
         <div className="text-end">
-          <Button variant="primary" onClick={handleSend}>
+          <Button variant="warning" onClick={handleSend}>
             <i className="bi bi-send me-1"></i>Send Email
           </Button>
         </div>

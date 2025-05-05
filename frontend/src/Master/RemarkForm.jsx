@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Modal, Button, Form } from 'react-bootstrap';
+import { useNavigate } from 'react-router-dom';
 
 const leadStageOptions = ['New', 'Contacted', 'Qualified', 'Proposal', 'Won', 'Lost'];
 const leadStatusOptions = ['Open', 'In Progress', 'Closed', 'On Hold'];
@@ -21,6 +22,8 @@ const RemarkForm = ({
     const [leadStatus, setLeadStatus] = useState('');
     const [leadType, setLeadType] = useState('');
 
+    const navigate = useNavigate();
+
     useEffect(() => {
         if (enquiry) {
             setRemarkText(enquiry.remark || '');
@@ -34,12 +37,10 @@ const RemarkForm = ({
     }, [enquiry, currentStatus]);
 
     const handleSave = () => {
-        // Combine date and time for follow up
         const followUpDateTime = nextFollowUpDate && nextFollowUpTime
             ? `${nextFollowUpDate}T${nextFollowUpTime}`
             : nextFollowUpDate;
 
-        // Call parent function to save data
         onSaveRemark(
             enquiryId,
             remarkText,
@@ -50,7 +51,6 @@ const RemarkForm = ({
             leadType
         );
 
-        // Clear form fields
         setRemarkText('');
         setStatus('Not Contacted');
         setNextFollowUpDate('');
@@ -58,16 +58,14 @@ const RemarkForm = ({
         setLeadStage('');
         setLeadStatus('');
         setLeadType('');
-        // Modal ko close nahi karna save ke baad!
     };
 
     const handleTransfer = () => {
-        // Transfer ka kaam
-        console.log('Transfer clicked for enquiryId:', enquiryId);
-        onHide(); // Transfer ke baad modal close karo
+        navigate('/transferred-enquiries');
     };
 
-    const showAdditionalFields = status !== 'Not Interested';
+    // Hide additional fields if status is "Converted" or "Not Interested"
+    const showAdditionalFields = status !== 'Converted' && status !== 'Not Interested';
 
     return (
         <Modal show={show} onHide={onHide} backdrop="static" keyboard={true}>
@@ -169,12 +167,20 @@ const RemarkForm = ({
                 <Button variant="secondary" onClick={onHide}>
                     Close
                 </Button>
-
-                <Button variant="primary" onClick={handleSave}>
-                    Save Remark
-                </Button>
-
-                    
+                {status === "Converted" ? (
+                    <>
+                        <Button variant="primary" onClick={handleSave}>
+                            Save Remark
+                        </Button>
+                        <Button variant="success" onClick={handleTransfer}>
+                            Transfer
+                        </Button>
+                    </>
+                ) : (
+                    <Button variant="primary" onClick={handleSave}>
+                        Save Remark
+                    </Button>
+                )}
             </Modal.Footer>
         </Modal>
     );

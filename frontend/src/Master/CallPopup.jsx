@@ -29,7 +29,7 @@ const CallPopup = ({ show, handleClose, clientName, clientMobile }) => {
 
   return (
     <Modal show={show} onHide={handleClose} size="lg" centered>
-      <Modal.Header closeButton className="bg-info text-white">
+      <Modal.Header closeButton className="bg-primary text-white">
         <Modal.Title>
           <i className="bi bi-telephone-fill me-2"></i>
           Call Log for <b>{clientName}</b>
@@ -66,7 +66,7 @@ const CallPopup = ({ show, handleClose, clientName, clientMobile }) => {
           />
         </Form.Group>
         <div className="d-flex justify-content-between">
-          <Button variant="info" onClick={handleLog}>
+          <Button variant="primary" onClick={handleLog}>
             <i className="bi bi-journal-text me-1"></i>Log Call
           </Button>
           <Button variant="success" onClick={handleCall}>

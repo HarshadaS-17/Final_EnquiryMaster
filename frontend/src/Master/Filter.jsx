@@ -1,13 +1,17 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 const FilterSidebar = ({ show, onClose }) => {
   if (!show) return null;
 
   return (
     <>
+      {/* Sidebar */}
       <div
         className="position-fixed top-0 end-0 h-100 bg-white shadow"
         style={{ width: '300px', zIndex: 1050 }}
+        onClick={e => e.stopPropagation()} // Prevent backdrop click from firing
+        role="dialog"
+        aria-modal="true"
       >
         <div className="d-flex justify-content-between align-items-center p-3 border-bottom bg-primary text-white">
           <h5 className="mb-0">Apply Filters</h5>
@@ -50,4 +54,17 @@ const FilterSidebar = ({ show, onClose }) => {
   );
 };
 
-export default FilterSidebar;   
+const App = () => {
+  const [showSidebar, setShowSidebar] = useState(false);
+
+  return (
+    <div>
+      <button className="btn btn-primary m-3" onClick={() => setShowSidebar(true)}>
+        Open Filters
+      </button>
+      <FilterSidebar show={showSidebar} onClose={() => setShowSidebar(false)} />
+    </div>
+  );
+};
+
+export default App;
